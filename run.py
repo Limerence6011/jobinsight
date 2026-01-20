@@ -24,6 +24,17 @@ import sys
 import os
 from pathlib import Path
 
+# 添加项目根目录到 Python 路径
+# 项目根目录本身就是 jobinsight 包（因为有 __init__.py）
+project_root = Path(__file__).resolve().parent
+# 将父目录添加到路径，这样 from jobinsight.xxx 才能工作
+parent_dir = project_root.parent
+if str(parent_dir) not in sys.path:
+    sys.path.insert(0, str(parent_dir))
+# 同时将项目根目录添加到路径，以便直接导入
+if str(project_root) not in sys.path:
+    sys.path.insert(0, str(project_root))
+
 def check_environment():
     """检查项目环境"""
     print("=" * 50)
