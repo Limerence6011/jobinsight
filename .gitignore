@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+*.log
+*.sqlite
+*.db
+data/raw/
+data/processed/
+*.html
+*.har
+*.htm
+job51_debug.html
+
+# Test files
+tests/test_crawler.log
+
+# Config (if contains sensitive info)
+# config.yaml
