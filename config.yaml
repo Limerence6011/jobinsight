@@ -1,0 +1,60 @@
+app:
+  data_days_window: 30
+  topn: 20
+
+database:
+  # MySQL 数据库配置
+  host: "localhost"
+  port: 3306
+  user: "root"
+  password: "root"
+  database: "jobinsight"
+  charset: "utf8mb4"
+
+crawler:
+  # data_sources: remoteok_api (default), placeholders: zhilian, boss, 51job
+  data_sources: ["remoteok_api"]
+  default_keyword: "python"
+  pages: 1
+  polite_sleep_min: 0.6
+  polite_sleep_max: 1.5
+  # 代理配置（可选）
+  # 如果设置了代理，将用于所有 HTTP 请求
+  # 格式: "http://127.0.0.1:7897" 或 "socks5://127.0.0.1:7897"
+  proxy_http: "http://127.0.0.1:7897"
+  proxy_https: "http://127.0.0.1:7897"
+
+recommend:
+  weight_similarity: 0.75
+  weight_salary: 0.25
+
+# 前程无忧51job平台配置（仅作学习交流使用）
+job51:
+  # 搜索关键词（支持多个，用列表形式）
+  keywords: ["Python"]
+  # 城市列表（使用规范城市名称，如"北京"、"上海"，"全国"表示全部）
+  cities: ["全国"]
+  # 区县列表（仅在指定单个城市时可使用，多个城市时建议不填）
+  regions: ["不限"]
+  # 薪资范围（月薪，单位：元）
+  salary_min: 0
+  salary_max: 50000
+  # 工作经验要求（可选值：不限、1年以下、1-3年、3-5年、5-10年、10年以上）
+  experience_levels: ["不限"]
+  # 学历要求（可选值：不限、高中、大专、本科、硕士、博士）
+  education_levels: ["不限"]
+  # 公司规模（可选值：不限、20人以下、20-99人、100-499人、500-999人、1000-9999人、10000人以上）
+  company_sizes: ["不限"]
+  # 公司性质（可选值：不限、国企、外资/合资、民营、上市公司、事业单位、其他）
+  company_types: ["不限"]
+  # 职位类型（可选值：不限、全职、实习、兼职）
+  job_terms: ["全职"]
+  # 排序方式（可选值：发布时间、相关度、薪资）
+  ordering: "发布时间"
+  # 每页数量（建议不超过50）
+  page_size: 50
+  # 最大页数（防止爬取过多数据）
+  max_pages: 10
+  # 请求延迟（秒，避免请求过快）
+  delay_min: 1.0
+  delay_max: 2.0

@@ -1,0 +1,636 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>JobInsight - 智能推荐</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <style>
+    :root {
+      --primary-color: #4f46e5;
+      --secondary-color: #10b981;
+      --accent-color: #f59e0b;
+    }
+    body {
+      background: #f8fafc;
+    }
+    .navbar-custom {
+      background: linear-gradient(135deg, var(--accent-color) 0%, #d97706 100%);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 1rem 0;
+    }
+    .navbar-custom .navbar-brand {
+      color: white !important;
+      font-weight: 700;
+      font-size: 1.5rem;
+    }
+    .filter-card {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+    .filter-card h5 {
+      color: var(--accent-color);
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+    }
+    .form-label {
+      font-weight: 500;
+      color: #374151;
+      margin-bottom: 0.5rem;
+    }
+    .form-control, .form-select {
+      border-radius: 10px;
+      border: 2px solid #e5e7eb;
+      padding: 0.75rem;
+      transition: all 0.3s;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 0.2rem rgba(245, 158, 11, 0.25);
+    }
+    .btn-warning {
+      background: linear-gradient(135deg, var(--accent-color) 0%, #d97706 100%);
+      border: none;
+      border-radius: 10px;
+      padding: 0.75rem 2rem;
+      font-weight: 600;
+      color: white;
+      transition: transform 0.2s;
+    }
+    .btn-warning:hover {
+      transform: scale(1.05);
+      color: white;
+    }
+    .results-card {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      padding: 1.5rem;
+    }
+    .table {
+      margin-bottom: 0;
+    }
+    .table thead {
+      background: linear-gradient(135deg, var(--accent-color) 0%, #d97706 100%);
+      color: white;
+    }
+    .table thead th {
+      border: none;
+      padding: 1rem;
+      font-weight: 600;
+    }
+    .table tbody tr {
+      transition: background-color 0.2s;
+    }
+    .table tbody tr:hover {
+      background-color: #f9fafb;
+    }
+    .badge-score {
+      background: linear-gradient(135deg, var(--secondary-color) 0%, #059669 100%);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: #6b7280;
+    }
+    .empty-state i {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+    .autocomplete-wrapper {
+      position: relative;
+    }
+    .autocomplete-suggestions {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 2px solid var(--accent-color);
+      border-top: none;
+      border-radius: 0 0 10px 10px;
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 1000;
+      display: none;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .autocomplete-suggestions.show {
+      display: block;
+    }
+    .autocomplete-item {
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .autocomplete-item:last-child {
+      border-bottom: none;
+    }
+    .autocomplete-item:hover,
+    .autocomplete-item.active {
+      background-color: #fef3c7;
+    }
+    .autocomplete-item.highlight {
+      font-weight: 600;
+      color: var(--accent-color);
+    }
+    .autocomplete-input:focus {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+    .autocomplete-input:focus + .autocomplete-suggestions {
+      display: block;
+    }
+    .input-with-clear {
+      position: relative;
+    }
+    .btn-clear-input {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #6b7280;
+      cursor: pointer;
+      padding: 0.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      transition: color 0.2s;
+    }
+    .btn-clear-input:hover {
+      color: #ef4444;
+    }
+    .btn-clear-input i {
+      font-size: 1.1rem;
+    }
+    .input-with-clear .autocomplete-input {
+      padding-right: 2.5rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- 导航栏 -->
+  <nav class="navbar navbar-expand-lg navbar-custom">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/">
+        <i class="bi bi-lightbulb-fill"></i> JobInsight 智能推荐
+      </a>
+      <div class="d-flex">
+        <a class="btn btn-light btn-sm" href="/">
+          <i class="bi bi-house"></i> 首页
+        </a>
+        <a class="btn btn-success btn-sm text-white" href="/dashboard">
+          <i class="bi bi-bar-chart"></i> 可视化看板
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container py-4">
+    <!-- 筛选表单 -->
+    <div class="filter-card">
+      <h5><i class="bi bi-funnel"></i> 筛选条件</h5>
+      <form method="post" id="recommendForm" class="row g-3">
+        <div class="col-md-3">
+          <label class="form-label"><i class="bi bi-geo-alt"></i> 城市/地区</label>
+          <div class="autocomplete-wrapper">
+            <div class="input-with-clear">
+              <input name="city" id="cityInput" class="form-control autocomplete-input" 
+                     placeholder="如：Beijing, Shanghai, Remote"
+                     value="{{ form_data.city if form_data else '' }}"
+                     autocomplete="off"/>
+              <button type="button" class="btn-clear-input" id="clearCityBtn" title="清空" style="display: none;">
+                <i class="bi bi-x-circle"></i>
+              </button>
+            </div>
+            <div class="autocomplete-suggestions" id="citySuggestions"></div>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label"><i class="bi bi-currency-dollar"></i> 最低月薪</label>
+          <input name="min_salary" type="number" class="form-control" 
+                 placeholder="如：10000"
+                 value="{{ form_data.min_salary if form_data else '' }}"/>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label"><i class="bi bi-briefcase"></i> 最大经验年限</label>
+          <input name="max_exp" type="number" class="form-control" 
+                 placeholder="如：3"
+                 value="{{ form_data.max_exp if form_data else '' }}"/>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label"><i class="bi bi-mortarboard"></i> 学历要求</label>
+          <select name="education" class="form-select">
+            <option value="">不限</option>
+            <option value="PhD" {% if form_data and form_data.education == 'PhD' %}selected{% endif %}>博士</option>
+            <option value="Master" {% if form_data and form_data.education == 'Master' %}selected{% endif %}>硕士</option>
+            <option value="Bachelor" {% if form_data and form_data.education == 'Bachelor' %}selected{% endif %}>本科</option>
+            <option value="College" {% if form_data and form_data.education == 'College' %}selected{% endif %}>大专</option>
+            <option value="HighSchool" {% if form_data and form_data.education == 'HighSchool' %}selected{% endif %}>高中</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label"><i class="bi bi-tag"></i> 岗位关键词</label>
+          <input name="keyword" id="keywordInput" class="form-control autocomplete-input" 
+                 placeholder="如：data, backend, frontend"
+                 value="{{ form_data.keyword if form_data else '' }}"
+                 autocomplete="off"/>
+        </div>
+        <div class="col-12">
+          <label class="form-label"><i class="bi bi-code-slash"></i> 技能关键词（用于相似度匹配）</label>
+          <div class="autocomplete-wrapper">
+            <input name="skills" id="skillsInput" class="form-control autocomplete-input" 
+                   placeholder="如：python pandas sql flask django" 
+                   value="{{ form_data.skills if form_data else '' }}"
+                   required
+                   autocomplete="off"/>
+            <div class="autocomplete-suggestions" id="skillsSuggestions"></div>
+          </div>
+          <small class="text-muted">输入你的技能关键词，系统会基于 TF-IDF 相似度进行匹配排序</small>
+        </div>
+        <div class="col-12">
+          <button class="btn btn-warning" type="submit">
+            <i class="bi bi-search"></i> 生成推荐
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- 推荐结果 -->
+    {% if rows and rows|length > 0 %}
+    <div class="results-card">
+      <h5 class="mb-3">
+        <i class="bi bi-list-check"></i> 推荐结果 
+        <span class="badge bg-primary">{{ rows|length }} 条</span>
+      </h5>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th>岗位名称</th>
+              <th>公司</th>
+              <th>地点</th>
+              <th>薪资</th>
+              <th>详情链接</th>
+              <th>匹配得分</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for r in rows %}
+            <tr>
+              <td>
+                <strong>{{ r.title }}</strong>
+              </td>
+              <td>{{ r.company }}</td>
+              <td>
+                <span class="badge bg-secondary">{{ r.city }}</span>
+              </td>
+              <td>
+                {% if r.salary_raw %}
+                  <span class="text-success fw-bold">{{ r.salary_raw }}</span>
+                {% else %}
+                  <span class="text-muted">面议</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if r.detail_url %}
+                  <a href="{{ r.detail_url }}" target="_blank" rel="noopener" 
+                     class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-box-arrow-up-right"></i> 查看
+                  </a>
+                {% else %}
+                  <span class="text-muted">-</span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge-score">{{ "%.3f"|format(r.score) }}</span>
+              </td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% elif request.method == "POST" %}
+    <div class="results-card">
+      <div class="empty-state">
+        <i class="bi bi-inbox"></i>
+        <h5>未找到匹配的岗位</h5>
+        <p>请尝试：</p>
+        <ul class="list-unstyled">
+          <li>• 放宽筛选条件（如降低最低薪资要求）</li>
+          <li>• 修改关键词或技能描述</li>
+          <li>• <a href="/">先采集更多数据</a></li>
+        </ul>
+      </div>
+    </div>
+    {% else %}
+    <div class="results-card">
+      <div class="empty-state">
+        <i class="bi bi-lightbulb"></i>
+        <h5>开始智能推荐</h5>
+        <p>填写上方筛选条件，系统将基于 TF-IDF 相似度和薪资权重为您推荐最匹配的岗位。</p>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // 自动完成数据
+    let autocompleteData = { cities: [], skills: [] };
+    
+    // 加载自动完成数据
+    async function loadAutocompleteData() {
+      try {
+        const response = await fetch('/api/autocomplete');
+        const data = await response.json();
+        autocompleteData = data;
+      } catch (error) {
+        console.error('加载自动完成数据失败:', error);
+      }
+    }
+    
+    // 创建自动完成功能
+    function createAutocomplete(input, suggestionsContainer, dataList, minLength = 1) {
+      let selectedIndex = -1;
+      let filteredItems = [];
+      
+      input.addEventListener('input', function(e) {
+        const value = this.value.trim();
+        const suggestions = suggestionsContainer;
+        
+        // 如果输入为空，关闭建议列表（允许用户清空选择）
+        if (value.length === 0) {
+          suggestions.classList.remove('show');
+          filteredItems = [];
+          return;
+        }
+        
+        // 如果输入长度小于最小长度，关闭建议列表
+        if (value.length < minLength) {
+          suggestions.classList.remove('show');
+          return;
+        }
+        
+        // 过滤匹配项
+        filteredItems = dataList.filter(item => 
+          item.toLowerCase().includes(value.toLowerCase())
+        ).slice(0, 10); // 限制显示数量
+        
+        if (filteredItems.length === 0) {
+          suggestions.classList.remove('show');
+          return;
+        }
+        
+        // 显示建议
+        suggestions.innerHTML = '';
+        filteredItems.forEach((item, index) => {
+          const div = document.createElement('div');
+          div.className = 'autocomplete-item';
+          div.textContent = item;
+          div.addEventListener('click', () => {
+            input.value = item;
+            suggestions.classList.remove('show');
+            selectedIndex = -1;
+            // 触发 input 事件以确保表单状态更新
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+          });
+          suggestions.appendChild(div);
+        });
+        
+        suggestions.classList.add('show');
+        selectedIndex = -1;
+      });
+      
+      // 添加焦点事件：当输入框获得焦点且已有值时，显示匹配的建议
+      input.addEventListener('focus', function(e) {
+        const value = this.value.trim();
+        if (value.length >= minLength) {
+          // 触发 input 事件以显示建议
+          this.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      });
+      
+      // 键盘导航
+      input.addEventListener('keydown', function(e) {
+        const suggestions = suggestionsContainer;
+        
+        if (!suggestions.classList.contains('show') || filteredItems.length === 0) {
+          return;
+        }
+        
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          selectedIndex = Math.min(selectedIndex + 1, filteredItems.length - 1);
+          updateSelection();
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          selectedIndex = Math.max(selectedIndex - 1, -1);
+          updateSelection();
+        } else if (e.key === 'Enter' && selectedIndex >= 0) {
+          e.preventDefault();
+          input.value = filteredItems[selectedIndex];
+          suggestions.classList.remove('show');
+          selectedIndex = -1;
+        } else if (e.key === 'Escape') {
+          suggestions.classList.remove('show');
+          selectedIndex = -1;
+        }
+      });
+      
+      function updateSelection() {
+        const items = suggestions.querySelectorAll('.autocomplete-item');
+        items.forEach((item, index) => {
+          if (index === selectedIndex) {
+            item.classList.add('active');
+            item.scrollIntoView({ block: 'nearest' });
+          } else {
+            item.classList.remove('active');
+          }
+        });
+      }
+      
+      // 点击外部关闭
+      document.addEventListener('click', function(e) {
+        if (!input.contains(e.target) && !suggestions.contains(e.target)) {
+          suggestions.classList.remove('show');
+        }
+      });
+    }
+    
+    // 初始化
+    document.addEventListener('DOMContentLoaded', async function() {
+      // 加载自动完成数据
+      await loadAutocompleteData();
+      
+      // 城市自动完成
+      const cityInput = document.getElementById('cityInput');
+      const citySuggestions = document.getElementById('citySuggestions');
+      const clearCityBtn = document.getElementById('clearCityBtn');
+      
+      if (cityInput && citySuggestions) {
+        // 城市输入框：至少输入1个字符才显示建议，允许清空
+        createAutocomplete(cityInput, citySuggestions, autocompleteData.cities, 1);
+        
+        // 显示/隐藏清除按钮
+        function updateClearButton() {
+          if (clearCityBtn) {
+            if (cityInput.value.trim().length > 0) {
+              clearCityBtn.style.display = 'flex';
+            } else {
+              clearCityBtn.style.display = 'none';
+            }
+          }
+        }
+        
+        // 监听输入变化
+        cityInput.addEventListener('input', updateClearButton);
+        
+        // 初始化清除按钮状态
+        updateClearButton();
+        
+        // 清除按钮点击事件
+        if (clearCityBtn) {
+          clearCityBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            cityInput.value = '';
+            citySuggestions.classList.remove('show');
+            cityInput.focus();
+            updateClearButton();
+            // 触发 input 事件以确保表单状态更新
+            cityInput.dispatchEvent(new Event('input', { bubbles: true }));
+          });
+        }
+      }
+      
+      // 技能关键词自动完成
+      const skillsInput = document.getElementById('skillsInput');
+      const skillsSuggestions = document.getElementById('skillsSuggestions');
+      if (skillsInput && skillsSuggestions) {
+        // 技能关键词支持多词输入，需要特殊处理
+        let lastWordStart = 0;
+        
+        skillsInput.addEventListener('input', function(e) {
+          const value = this.value;
+          const cursorPos = this.selectionStart;
+          
+          // 找到当前正在输入的词（最后一个空格后的词）
+          const textBeforeCursor = value.substring(0, cursorPos);
+          const lastSpaceIndex = textBeforeCursor.lastIndexOf(' ');
+          lastWordStart = lastSpaceIndex + 1;
+          const currentWord = textBeforeCursor.substring(lastWordStart).trim();
+          
+          if (currentWord.length < 1) {
+            skillsSuggestions.classList.remove('show');
+            return;
+          }
+          
+          // 过滤匹配项
+          const filteredItems = autocompleteData.skills.filter(item => 
+            item.toLowerCase().includes(currentWord.toLowerCase()) &&
+            !value.toLowerCase().includes(item.toLowerCase()) // 避免重复
+          ).slice(0, 10);
+          
+          if (filteredItems.length === 0) {
+            skillsSuggestions.classList.remove('show');
+            return;
+          }
+          
+          // 显示建议
+          skillsSuggestions.innerHTML = '';
+          filteredItems.forEach((item) => {
+            const div = document.createElement('div');
+            div.className = 'autocomplete-item';
+            div.textContent = item;
+            div.addEventListener('click', () => {
+              const beforeWord = value.substring(0, lastWordStart);
+              const afterWord = value.substring(cursorPos);
+              skillsInput.value = beforeWord + item + ' ' + afterWord;
+              skillsInput.focus();
+              skillsInput.setSelectionRange(beforeWord.length + item.length + 1, beforeWord.length + item.length + 1);
+              skillsSuggestions.classList.remove('show');
+            });
+            skillsSuggestions.appendChild(div);
+          });
+          
+          skillsSuggestions.classList.add('show');
+        });
+        
+        // 键盘导航（简化版）
+        let selectedIndex = -1;
+        let filteredItems = [];
+        
+        skillsInput.addEventListener('keydown', function(e) {
+          if (!skillsSuggestions.classList.contains('show')) {
+            return;
+          }
+          
+          const items = skillsSuggestions.querySelectorAll('.autocomplete-item');
+          if (items.length === 0) return;
+          
+          if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+            items[selectedIndex].classList.add('active');
+            items[selectedIndex].scrollIntoView({ block: 'nearest' });
+            if (selectedIndex > 0) {
+              items[selectedIndex - 1].classList.remove('active');
+            }
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (selectedIndex > 0) {
+              items[selectedIndex].classList.remove('active');
+              selectedIndex--;
+              items[selectedIndex].classList.add('active');
+              items[selectedIndex].scrollIntoView({ block: 'nearest' });
+            }
+          } else if (e.key === 'Enter' && selectedIndex >= 0) {
+            e.preventDefault();
+            const item = items[selectedIndex];
+            item.click();
+            selectedIndex = -1;
+          } else if (e.key === 'Escape') {
+            skillsSuggestions.classList.remove('show');
+            selectedIndex = -1;
+          }
+        });
+        
+        // 点击外部关闭
+        document.addEventListener('click', function(e) {
+          if (!skillsInput.contains(e.target) && !skillsSuggestions.contains(e.target)) {
+            skillsSuggestions.classList.remove('show');
+          }
+        });
+      }
+      
+      // 表单提交提示
+      document.getElementById('recommendForm').addEventListener('submit', function(e) {
+        const btn = this.querySelector('button[type="submit"]');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> 计算中...';
+        btn.disabled = true;
+        
+        // 关闭所有自动完成提示
+        document.querySelectorAll('.autocomplete-suggestions').forEach(el => {
+          el.classList.remove('show');
+        });
+      });
+    });
+  </script>
+</body>
+</html>

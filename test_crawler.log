@@ -1,0 +1,238 @@
+2026-01-19 23:07:12,748 [INFO] __main__: ================================================================================
+2026-01-19 23:07:12,749 [INFO] __main__: 开始测试51job爬虫
+2026-01-19 23:07:12,749 [INFO] __main__: ================================================================================
+2026-01-19 23:07:12,749 [INFO] __main__: 参数: keyword=C, city=None, pages=1
+2026-01-19 23:07:12,752 [INFO] __main__: 使用代理: {'http': 'http://127.0.0.1:7897', 'https': 'http://127.0.0.1:7897'}
+2026-01-19 23:07:12,752 [INFO] __main__: 
+================================================================================
+2026-01-19 23:07:12,753 [INFO] __main__: 正在爬取第 1/1 页
+2026-01-19 23:07:12,753 [INFO] __main__: ================================================================================
+2026-01-19 23:07:12,753 [INFO] __main__: 调用 fetch() 方法...
+2026-01-19 23:07:12,753 [INFO] jobinsight.crawler.platforms.job51.adapter: 尝试API接口: https://we.51job.com/api/job/search-pc?api_key=51job&timestamp=1768835232&keyword=C&searchType=2&fun...
+2026-01-19 23:07:14,041 [DEBUG] urllib3.connectionpool: Starting new HTTPS connection (1): we.51job.com:443
+2026-01-19 23:07:14,111 [DEBUG] urllib3.connectionpool: https://we.51job.com:443 "GET /api/job/search-pc?api_key=51job&timestamp=1768835232&keyword=C&searchType=2&function=&industry=&jobArea=&jobArea2=&landmark=&metro=&salary=&workYear=&degree=&companyType=&companySize=&jobType=&issueDate=&sortType=0&pageNum=1&requestId=&pageSize=20&source=1&accountId=&pageCode=sou%7Csou%7Csoulb&scene=7 HTTP/1.1" 200 None
+2026-01-19 23:07:14,112 [INFO] jobinsight.crawler.platforms.job51.adapter: 尝试旧版URL: https://search.51job.com/list/000000,000000,0000,00,9,99,C,2,1.html
+2026-01-19 23:07:15,273 [DEBUG] urllib3.connectionpool: Starting new HTTPS connection (1): search.51job.com:443
+2026-01-19 23:07:15,364 [DEBUG] urllib3.connectionpool: https://search.51job.com:443 "GET /list/000000,000000,0000,00,9,99,C,2,1.html HTTP/1.1" 302 0
+2026-01-19 23:07:15,379 [DEBUG] urllib3.connectionpool: https://we.51job.com:443 "GET /pc/search?keyword=C&searchType=2&sortType=0&metro= HTTP/1.1" 200 None
+2026-01-19 23:07:15,380 [INFO] jobinsight.crawler.platforms.job51.adapter: 使用旧版URL成功获取数据
+2026-01-19 23:07:15,381 [INFO] __main__: 获取到数据，长度: 12765 字符
+2026-01-19 23:07:15,381 [INFO] __main__: 调用 parse() 方法...
+2026-01-19 23:07:15,389 [WARNING] jobinsight.crawler.platforms.job51.adapter: 未找到职位列表，可能页面结构已变化或需要登录
+2026-01-19 23:07:15,390 [INFO] __main__: 解析到 0 个职位
+2026-01-19 23:07:15,390 [WARNING] __main__: 未解析到任何职位
+2026-01-19 23:07:15,390 [INFO] __main__: 
+================================================================================
+2026-01-19 23:07:15,390 [INFO] __main__: 数据去重
+2026-01-19 23:07:15,390 [INFO] __main__: ================================================================================
+2026-01-19 23:07:15,390 [INFO] __main__: 去重前: 0 条
+2026-01-19 23:07:15,390 [INFO] __main__: 去重后: 0 条
+2026-01-19 23:07:15,390 [INFO] __main__: 
+================================================================================
+2026-01-19 23:07:15,390 [INFO] __main__: 测试完成 - 统计信息
+2026-01-19 23:07:15,390 [INFO] __main__: ================================================================================
+2026-01-19 23:07:15,390 [INFO] __main__: 关键词: C
+2026-01-19 23:07:15,390 [INFO] __main__: 城市: 全部
+2026-01-19 23:07:15,390 [INFO] __main__: 爬取页数: 1
+2026-01-19 23:07:15,391 [INFO] __main__: 成功采集: 0 条职位
+2026-01-20 20:55:49,976 [INFO] __main__: ================================================================================
+2026-01-20 20:55:49,976 [INFO] __main__: 开始测试51job爬虫（循环重试模式）
+2026-01-20 20:55:49,976 [INFO] __main__: ================================================================================
+2026-01-20 20:55:49,976 [INFO] __main__: 参数: keyword=C, city=None, pages=1
+2026-01-20 20:55:49,976 [INFO] __main__: 重试策略: 最多尝试3次, 成功条件≥1条, 连续失败2次停止
+2026-01-20 20:55:49,979 [INFO] __main__: 使用代理: {'http': 'http://127.0.0.1:7897', 'https': 'http://127.0.0.1:7897'}
+2026-01-20 20:55:49,979 [INFO] __main__: 
+================================================================================
+2026-01-20 20:55:49,979 [INFO] __main__: 第 1/3 次尝试
+2026-01-20 20:55:49,979 [INFO] __main__: ================================================================================
+2026-01-20 20:55:49,979 [INFO] __main__: 连续失败次数: 0/2
+2026-01-20 20:55:49,979 [INFO] __main__: 累计成功次数: 0
+2026-01-20 20:55:49,979 [INFO] __main__: 累计采集职位: 0 条
+2026-01-20 20:55:49,981 [INFO] __main__: 
+  --- 第 1/1 页 ---
+2026-01-20 20:55:49,981 [INFO] __main__:   调用 fetch() 方法...
+2026-01-20 20:55:49,981 [INFO] jobinsight.crawler.platforms.job51.adapter: 尝试API接口: https://we.51job.com/api/job/search-pc?api_key=51job&timestamp=1768913749&keyword=C&searchType=2&fun...
+2026-01-20 20:55:51,260 [DEBUG] urllib3.connectionpool: Starting new HTTPS connection (1): we.51job.com:443
+2026-01-20 20:55:51,336 [DEBUG] urllib3.connectionpool: https://we.51job.com:443 "GET /api/job/search-pc?api_key=51job&timestamp=1768913749&keyword=C&searchType=2&function=&industry=&jobArea=&jobArea2=&landmark=&metro=&salary=&workYear=&degree=&companyType=&companySize=&jobType=&issueDate=&sortType=0&pageNum=1&requestId=&pageSize=20&source=1&accountId=&pageCode=sou%7Csou%7Csoulb&scene=7 HTTP/1.1" 200 None
+2026-01-20 20:55:51,337 [WARNING] jobinsight.crawler.platforms.job51.adapter: API返回非JSON响应，可能是反爬虫页面或需要签名
+2026-01-20 20:55:51,337 [INFO] jobinsight.crawler.platforms.job51.adapter: 尝试旧版URL: https://search.51job.com/list/000000,000000,0000,00,9,99,C,2,1.html
+2026-01-20 20:55:53,076 [DEBUG] urllib3.connectionpool: Starting new HTTPS connection (1): search.51job.com:443
+2026-01-20 20:55:53,192 [DEBUG] urllib3.connectionpool: https://search.51job.com:443 "GET /list/000000,000000,0000,00,9,99,C,2,1.html HTTP/1.1" 302 0
+2026-01-20 20:55:53,210 [DEBUG] urllib3.connectionpool: https://we.51job.com:443 "GET /pc/search?keyword=C&searchType=2&sortType=0&metro= HTTP/1.1" 200 None
+2026-01-20 20:55:53,211 [INFO] jobinsight.crawler.platforms.job51.adapter: 使用旧版URL成功获取数据
+2026-01-20 20:55:53,211 [INFO] __main__:   获取到数据，长度: 12765 字符
+2026-01-20 20:55:53,211 [INFO] __main__:   调用 parse() 方法...
+2026-01-20 20:55:53,220 [WARNING] jobinsight.crawler.platforms.job51.adapter: 未找到职位列表，可能页面结构已变化或需要登录
+2026-01-20 20:55:53,220 [INFO] __main__:   解析到 0 个职位
+2026-01-20 20:55:53,220 [WARNING] __main__:   未解析到任何职位
+2026-01-20 20:55:53,221 [WARNING] __main__: 
+[失败] 第 1 次尝试未采集到任何职位
+2026-01-20 20:55:53,221 [INFO] __main__: 
+等待下一次尝试...
+2026-01-20 20:55:55,221 [INFO] __main__: 
+================================================================================
+2026-01-20 20:55:55,221 [INFO] __main__: 第 2/3 次尝试
+2026-01-20 20:55:55,221 [INFO] __main__: ================================================================================
+2026-01-20 20:55:55,221 [INFO] __main__: 连续失败次数: 1/2
+2026-01-20 20:55:55,221 [INFO] __main__: 累计成功次数: 0
+2026-01-20 20:55:55,221 [INFO] __main__: 累计采集职位: 0 条
+2026-01-20 20:55:55,221 [INFO] __main__: 
+  --- 第 1/1 页 ---
+2026-01-20 20:55:55,221 [INFO] __main__:   调用 fetch() 方法...
+2026-01-20 20:55:55,221 [INFO] jobinsight.crawler.platforms.job51.adapter: 尝试API接口: https://we.51job.com/api/job/search-pc?api_key=51job&timestamp=1768913755&keyword=C&searchType=2&fun...
+2026-01-20 20:55:56,913 [DEBUG] urllib3.connectionpool: https://we.51job.com:443 "GET /api/job/search-pc?api_key=51job&timestamp=1768913755&keyword=C&searchType=2&function=&industry=&jobArea=&jobArea2=&landmark=&metro=&salary=&workYear=&degree=&companyType=&companySize=&jobType=&issueDate=&sortType=0&pageNum=1&requestId=&pageSize=20&source=1&accountId=&pageCode=sou%7Csou%7Csoulb&scene=7 HTTP/1.1" 200 None
+2026-01-20 20:55:56,914 [WARNING] jobinsight.crawler.platforms.job51.adapter: API返回非JSON响应，可能是反爬虫页面或需要签名
+2026-01-20 20:55:56,914 [INFO] jobinsight.crawler.platforms.job51.adapter: 尝试旧版URL: https://search.51job.com/list/000000,000000,0000,00,9,99,C,2,1.html
+2026-01-20 20:55:58,178 [DEBUG] urllib3.connectionpool: https://search.51job.com:443 "GET /list/000000,000000,0000,00,9,99,C,2,1.html HTTP/1.1" 302 0
+2026-01-20 20:55:58,195 [DEBUG] urllib3.connectionpool: https://we.51job.com:443 "GET /pc/search?keyword=C&searchType=2&sortType=0&metro= HTTP/1.1" 200 None
+2026-01-20 20:55:58,196 [INFO] jobinsight.crawler.platforms.job51.adapter: 使用旧版URL成功获取数据
+2026-01-20 20:55:58,196 [INFO] __main__:   获取到数据，长度: 12765 字符
+2026-01-20 20:55:58,196 [INFO] __main__:   调用 parse() 方法...
+2026-01-20 20:55:58,203 [WARNING] jobinsight.crawler.platforms.job51.adapter: 未找到职位列表，可能页面结构已变化或需要登录
+2026-01-20 20:55:58,203 [INFO] __main__:   解析到 0 个职位
+2026-01-20 20:55:58,203 [WARNING] __main__:   未解析到任何职位
+2026-01-20 20:55:58,203 [WARNING] __main__: 
+[失败] 第 2 次尝试未采集到任何职位
+2026-01-20 20:55:58,203 [ERROR] __main__: [无法达到目的] 连续失败 2 次，停止重试
+2026-01-20 20:55:58,203 [INFO] __main__: 
+================================================================================
+2026-01-20 20:55:58,203 [INFO] __main__: 循环测试完成
+2026-01-20 20:55:58,203 [INFO] __main__: ================================================================================
+2026-01-20 20:55:58,203 [INFO] __main__: 去重前: 0 条
+2026-01-20 20:55:58,203 [INFO] __main__: 去重后: 0 条
+2026-01-20 20:55:58,203 [INFO] __main__: 
+================================================================================
+2026-01-20 20:55:58,205 [INFO] __main__: 最终统计信息
+2026-01-20 20:55:58,205 [INFO] __main__: ================================================================================
+2026-01-20 20:55:58,205 [INFO] __main__: 关键词: C
+2026-01-20 20:55:58,205 [INFO] __main__: 城市: 全部
+2026-01-20 20:55:58,205 [INFO] __main__: 每轮页数: 1
+2026-01-20 20:55:58,205 [INFO] __main__: 总尝试次数: 2/3
+2026-01-20 20:55:58,205 [INFO] __main__: 成功次数: 0
+2026-01-20 20:55:58,205 [INFO] __main__: 失败次数: 2
+2026-01-20 20:55:58,205 [INFO] __main__: 成功采集: 0 条职位
+2026-01-20 20:55:58,205 [INFO] __main__: 停止原因: 连续失败2次，无法达到目的
+2026-01-20 21:03:33,338 [INFO] __main__: ================================================================================
+2026-01-20 21:03:33,338 [INFO] __main__: 开始测试51job爬虫（循环重试模式）
+2026-01-20 21:03:33,338 [INFO] __main__: ================================================================================
+2026-01-20 21:03:33,338 [INFO] __main__: 参数: keyword=C, city=None, pages=1
+2026-01-20 21:03:33,338 [INFO] __main__: 重试策略: 最多尝试8次, 成功条件≥1条, 连续失败3次停止
+2026-01-20 21:03:33,341 [INFO] __main__: 使用代理: {'http': 'http://127.0.0.1:7897', 'https': 'http://127.0.0.1:7897'}
+2026-01-20 21:03:33,342 [INFO] __main__: 
+================================================================================
+2026-01-20 21:03:33,342 [INFO] __main__: 第 1/8 次尝试
+2026-01-20 21:03:33,342 [INFO] __main__: ================================================================================
+2026-01-20 21:03:33,342 [INFO] __main__: 连续失败次数: 0/3
+2026-01-20 21:03:33,342 [INFO] __main__: 累计成功次数: 0
+2026-01-20 21:03:33,342 [INFO] __main__: 累计采集职位: 0 条
+2026-01-20 21:03:33,342 [INFO] __main__: 
+  --- 第 1/1 页 ---
+2026-01-20 21:03:33,342 [INFO] __main__:   调用 fetch() 方法...
+2026-01-20 21:03:33,343 [INFO] jobinsight.crawler.platforms.job51.adapter: 尝试API接口: https://we.51job.com/api/job/search-pc?api_key=51job&timestamp=1768914213&keyword=C&searchType=2&fun...
+2026-01-20 21:03:34,860 [DEBUG] urllib3.connectionpool: Starting new HTTPS connection (1): we.51job.com:443
+2026-01-20 21:03:34,935 [DEBUG] urllib3.connectionpool: https://we.51job.com:443 "GET /api/job/search-pc?api_key=51job&timestamp=1768914213&keyword=C&searchType=2&function=&industry=&jobArea=&jobArea2=&landmark=&metro=&salary=&workYear=&degree=&companyType=&companySize=&jobType=&issueDate=&sortType=0&pageNum=1&requestId=&pageSize=20&source=1&accountId=&pageCode=sou%7Csou%7Csoulb&scene=7 HTTP/1.1" 200 None
+2026-01-20 21:03:34,935 [WARNING] jobinsight.crawler.platforms.job51.adapter: API返回非JSON响应，可能是反爬虫页面或需要签名
+2026-01-20 21:03:34,935 [INFO] jobinsight.crawler.platforms.job51.adapter: 尝试旧版URL: https://search.51job.com/list/000000,000000,0000,00,9,99,C,2,1.html
+2026-01-20 21:05:52,165 [INFO] __main__: ================================================================================
+2026-01-20 21:05:52,166 [INFO] __main__: 开始测试51job爬虫（循环重试模式）
+2026-01-20 21:05:52,166 [INFO] __main__: ================================================================================
+2026-01-20 21:05:52,166 [INFO] __main__: 参数: keyword=C, city=None, pages=1
+2026-01-20 21:05:52,166 [INFO] __main__: 重试策略: 最多尝试8次, 成功条件≥1条, 连续失败3次停止
+2026-01-20 21:05:52,169 [INFO] __main__: 使用代理: {'http': 'http://127.0.0.1:7897', 'https': 'http://127.0.0.1:7897'}
+2026-01-20 21:05:52,170 [INFO] __main__: 
+================================================================================
+2026-01-20 21:05:52,170 [INFO] __main__: 第 1/8 次尝试
+2026-01-20 21:05:52,170 [INFO] __main__: ================================================================================
+2026-01-20 21:05:52,170 [INFO] __main__: 连续失败次数: 0/3
+2026-01-20 21:05:52,171 [INFO] __main__: 累计成功次数: 0
+2026-01-20 21:05:52,171 [INFO] __main__: 累计采集职位: 0 条
+2026-01-20 21:05:52,171 [INFO] __main__: 
+  --- 第 1/1 页 ---
+2026-01-20 21:05:52,171 [INFO] __main__:   调用 fetch() 方法...
+2026-01-20 21:05:52,172 [INFO] jobinsight.crawler.platforms.job51.adapter: 尝试API接口: https://we.51job.com/api/job/search-pc?api_key=51job&timestamp=1768914352&keyword=C&searchType=2&fun...
+2026-01-20 21:05:53,759 [DEBUG] urllib3.connectionpool: Starting new HTTPS connection (1): we.51job.com:443
+2026-01-20 21:05:53,845 [DEBUG] urllib3.connectionpool: https://we.51job.com:443 "GET /api/job/search-pc?api_key=51job&timestamp=1768914352&keyword=C&searchType=2&function=&industry=&jobArea=&jobArea2=&landmark=&metro=&salary=&workYear=&degree=&companyType=&companySize=&jobType=&issueDate=&sortType=0&pageNum=1&requestId=&pageSize=20&source=1&accountId=&pageCode=sou%7Csou%7Csoulb&scene=7 HTTP/1.1" 200 None
+2026-01-20 21:05:53,846 [WARNING] jobinsight.crawler.platforms.job51.adapter: API返回非JSON响应，可能是反爬虫页面或需要签名
+2026-01-20 21:05:53,846 [INFO] jobinsight.crawler.platforms.job51.adapter: 尝试旧版URL: https://search.51job.com/list/000000,000000,0000,00,9,99,C,2,1.html
+2026-01-20 21:05:54,994 [DEBUG] urllib3.connectionpool: Starting new HTTPS connection (1): search.51job.com:443
+2026-01-20 21:05:55,098 [DEBUG] urllib3.connectionpool: https://search.51job.com:443 "GET /list/000000,000000,0000,00,9,99,C,2,1.html HTTP/1.1" 302 0
+2026-01-20 21:05:55,117 [DEBUG] urllib3.connectionpool: https://we.51job.com:443 "GET /pc/search?keyword=C&searchType=2&sortType=0&metro= HTTP/1.1" 200 None
+2026-01-20 21:05:55,118 [INFO] jobinsight.crawler.platforms.job51.adapter: 使用旧版URL成功获取数据
+2026-01-20 21:05:55,118 [INFO] __main__:   获取到数据，长度: 12765 字符
+2026-01-20 21:05:55,118 [INFO] __main__:   调用 parse() 方法...
+2026-01-20 21:05:55,127 [WARNING] jobinsight.crawler.platforms.job51.adapter: 未找到职位列表，可能页面结构已变化或需要登录
+2026-01-20 21:05:55,128 [INFO] __main__:   解析到 0 个职位
+2026-01-20 21:05:55,128 [WARNING] __main__:   未解析到任何职位
+2026-01-20 21:05:55,128 [WARNING] __main__: 
+[失败] 第 1 次尝试未采集到任何职位
+2026-01-20 21:05:55,129 [INFO] __main__: 
+等待下一次尝试...
+2026-01-20 21:05:57,130 [INFO] __main__: 
+================================================================================
+2026-01-20 21:05:57,130 [INFO] __main__: 第 2/8 次尝试
+2026-01-20 21:05:57,130 [INFO] __main__: ================================================================================
+2026-01-20 21:05:57,130 [INFO] __main__: 连续失败次数: 1/3
+2026-01-20 21:05:57,131 [INFO] __main__: 累计成功次数: 0
+2026-01-20 21:05:57,131 [INFO] __main__: 累计采集职位: 0 条
+2026-01-20 21:05:57,131 [INFO] __main__: 
+  --- 第 1/1 页 ---
+2026-01-20 21:05:57,131 [INFO] __main__:   调用 fetch() 方法...
+2026-01-20 21:05:57,132 [INFO] jobinsight.crawler.platforms.job51.adapter: 尝试API接口: https://we.51job.com/api/job/search-pc?api_key=51job&timestamp=1768914357&keyword=C&searchType=2&fun...
+2026-01-20 21:05:58,190 [DEBUG] urllib3.connectionpool: https://we.51job.com:443 "GET /api/job/search-pc?api_key=51job&timestamp=1768914357&keyword=C&searchType=2&function=&industry=&jobArea=&jobArea2=&landmark=&metro=&salary=&workYear=&degree=&companyType=&companySize=&jobType=&issueDate=&sortType=0&pageNum=1&requestId=&pageSize=20&source=1&accountId=&pageCode=sou%7Csou%7Csoulb&scene=7 HTTP/1.1" 200 None
+2026-01-20 21:05:58,190 [WARNING] jobinsight.crawler.platforms.job51.adapter: API返回非JSON响应，可能是反爬虫页面或需要签名
+2026-01-20 21:05:58,190 [INFO] jobinsight.crawler.platforms.job51.adapter: 尝试旧版URL: https://search.51job.com/list/000000,000000,0000,00,9,99,C,2,1.html
+2026-01-20 21:05:59,849 [DEBUG] urllib3.connectionpool: https://search.51job.com:443 "GET /list/000000,000000,0000,00,9,99,C,2,1.html HTTP/1.1" 302 0
+2026-01-20 21:05:59,864 [DEBUG] urllib3.connectionpool: https://we.51job.com:443 "GET /pc/search?keyword=C&searchType=2&sortType=0&metro= HTTP/1.1" 200 None
+2026-01-20 21:05:59,865 [INFO] jobinsight.crawler.platforms.job51.adapter: 使用旧版URL成功获取数据
+2026-01-20 21:05:59,865 [INFO] __main__:   获取到数据，长度: 12765 字符
+2026-01-20 21:05:59,865 [INFO] __main__:   调用 parse() 方法...
+2026-01-20 21:05:59,873 [WARNING] jobinsight.crawler.platforms.job51.adapter: 未找到职位列表，可能页面结构已变化或需要登录
+2026-01-20 21:05:59,873 [INFO] __main__:   解析到 0 个职位
+2026-01-20 21:05:59,873 [WARNING] __main__:   未解析到任何职位
+2026-01-20 21:05:59,873 [WARNING] __main__: 
+[失败] 第 2 次尝试未采集到任何职位
+2026-01-20 21:05:59,874 [INFO] __main__: 
+等待下一次尝试...
+2026-01-20 21:06:01,875 [INFO] __main__: 
+================================================================================
+2026-01-20 21:06:01,875 [INFO] __main__: 第 3/8 次尝试
+2026-01-20 21:06:01,875 [INFO] __main__: ================================================================================
+2026-01-20 21:06:01,876 [INFO] __main__: 连续失败次数: 2/3
+2026-01-20 21:06:01,876 [INFO] __main__: 累计成功次数: 0
+2026-01-20 21:06:01,876 [INFO] __main__: 累计采集职位: 0 条
+2026-01-20 21:06:01,876 [INFO] __main__: 
+  --- 第 1/1 页 ---
+2026-01-20 21:06:01,876 [INFO] __main__:   调用 fetch() 方法...
+2026-01-20 21:06:01,877 [INFO] jobinsight.crawler.platforms.job51.adapter: 尝试API接口: https://we.51job.com/api/job/search-pc?api_key=51job&timestamp=1768914361&keyword=C&searchType=2&fun...
+2026-01-20 21:06:03,338 [DEBUG] urllib3.connectionpool: https://we.51job.com:443 "GET /api/job/search-pc?api_key=51job&timestamp=1768914361&keyword=C&searchType=2&function=&industry=&jobArea=&jobArea2=&landmark=&metro=&salary=&workYear=&degree=&companyType=&companySize=&jobType=&issueDate=&sortType=0&pageNum=1&requestId=&pageSize=20&source=1&accountId=&pageCode=sou%7Csou%7Csoulb&scene=7 HTTP/1.1" 200 None
+2026-01-20 21:06:03,339 [WARNING] jobinsight.crawler.platforms.job51.adapter: API返回非JSON响应，可能是反爬虫页面或需要签名
+2026-01-20 21:06:03,339 [INFO] jobinsight.crawler.platforms.job51.adapter: 尝试旧版URL: https://search.51job.com/list/000000,000000,0000,00,9,99,C,2,1.html
+2026-01-20 21:06:04,578 [DEBUG] urllib3.connectionpool: https://search.51job.com:443 "GET /list/000000,000000,0000,00,9,99,C,2,1.html HTTP/1.1" 302 0
+2026-01-20 21:06:04,592 [DEBUG] urllib3.connectionpool: https://we.51job.com:443 "GET /pc/search?keyword=C&searchType=2&sortType=0&metro= HTTP/1.1" 200 None
+2026-01-20 21:06:04,593 [INFO] jobinsight.crawler.platforms.job51.adapter: 使用旧版URL成功获取数据
+2026-01-20 21:06:04,593 [INFO] __main__:   获取到数据，长度: 12765 字符
+2026-01-20 21:06:04,593 [INFO] __main__:   调用 parse() 方法...
+2026-01-20 21:06:04,600 [WARNING] jobinsight.crawler.platforms.job51.adapter: 未找到职位列表，可能页面结构已变化或需要登录
+2026-01-20 21:06:04,601 [INFO] __main__:   解析到 0 个职位
+2026-01-20 21:06:04,601 [WARNING] __main__:   未解析到任何职位
+2026-01-20 21:06:04,601 [WARNING] __main__: 
+[失败] 第 3 次尝试未采集到任何职位
+2026-01-20 21:06:04,601 [ERROR] __main__: [无法达到目的] 连续失败 3 次，停止重试
+2026-01-20 21:06:04,601 [INFO] __main__: 
+================================================================================
+2026-01-20 21:06:04,601 [INFO] __main__: 循环测试完成
+2026-01-20 21:06:04,602 [INFO] __main__: ================================================================================
+2026-01-20 21:06:04,602 [INFO] __main__: 去重前: 0 条
+2026-01-20 21:06:04,602 [INFO] __main__: 去重后: 0 条
+2026-01-20 21:06:04,603 [INFO] __main__: 
+================================================================================
+2026-01-20 21:06:04,603 [INFO] __main__: 最终统计信息
+2026-01-20 21:06:04,603 [INFO] __main__: ================================================================================
+2026-01-20 21:06:04,603 [INFO] __main__: 关键词: C
+2026-01-20 21:06:04,603 [INFO] __main__: 城市: 全部
+2026-01-20 21:06:04,604 [INFO] __main__: 每轮页数: 1
+2026-01-20 21:06:04,604 [INFO] __main__: 总尝试次数: 3/8
+2026-01-20 21:06:04,604 [INFO] __main__: 成功次数: 0
+2026-01-20 21:06:04,604 [INFO] __main__: 失败次数: 3
+2026-01-20 21:06:04,604 [INFO] __main__: 成功采集: 0 条职位
+2026-01-20 21:06:04,604 [INFO] __main__: 停止原因: 连续失败3次，无法达到目的
