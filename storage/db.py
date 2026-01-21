@@ -1,6 +1,7 @@
 from __future__ import annotations
 import json
 import datetime as dt
+from typing import Set, Tuple
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
@@ -15,6 +16,54 @@ ENGINE = create_engine(get_db_url(), echo=False, pool_pre_ping=True, pool_recycl
 
 # 创建表（如果不存在）
 Base.metadata.create_all(ENGINE)
+
+def get_existing_job_keys(platform: str = None, keyword: str = None, city: str = None, limit: int = 1000) -> Set[Tuple[str, str]]:
+    """
+    查询数据库中现有的job数据，返回 (platform, job_id) 的集合
+    
+    Args:
+        platform: 平台名称（可选，如果为None则查询所有平台）
+        keyword: 关键词（可选，用于过滤title）
+        city: 城市（可选，用于过滤）
+        limit: 最多返回的记录数（如果为None则不限制）
+    
+    Returns:
+        Set[Tuple[str, str]]: (platform, job_id) 的集合
+    """
+    with Session(ENGINE) as sess:
+        query = sess.query(Job)
+        
+        # 如果提供了平台，过滤平台
+        if platform:
+            query = query.filter(Job.platform == platform)
+        
+        # 如果提供了关键词，在title中搜索
+        if keyword:
+            keyword_lower = keyword.lower()
+            query = query.filter(Job.title.ilike(f"%{keyword_lower}%"))
+        
+        # 如果提供了城市，过滤城市
+        if city:
+            city_normalized = normalize_city(city)
+            query = query.filter(Job.city == city_normalized)
+        
+        # 如果提供了limit，限制返回数量
+        if limit:
+            jobs = query.limit(limit).all()
+        else:
+            jobs = query.all()
+        
+        # 返回 (platform, job_id) 的集合
+        return {(job.platform, job.job_id) for job in jobs}
+
+def get_all_existing_job_keys() -> Set[Tuple[str, str]]:
+    """
+    查询数据库中所有现有的job数据，返回 (platform, job_id) 的集合
+    
+    Returns:
+        Set[Tuple[str, str]]: (platform, job_id) 的集合
+    """
+    return get_existing_job_keys(platform=None, keyword=None, city=None, limit=None)
 
 def upsert_jobs(posts: list[JobPost]) -> None:
     today = dt.date.today().isoformat()

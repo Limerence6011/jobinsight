@@ -147,16 +147,23 @@
         </div>
         <div class="card-body p-4">
           <form method="post" action="/crawl" id="crawlForm" class="row g-3">
-            <div class="col-md-5">
+            <div class="col-md-3">
+              <label class="form-label"><i class="bi bi-layers"></i> 数据平台</label>
+              <select name="platform" class="form-select" required>
+                <option value="remoteok">RemoteOK</option>
+                <option value="job51" selected>前程无忧 (51job)</option>
+              </select>
+            </div>
+            <div class="col-md-4">
               <label class="form-label"><i class="bi bi-search"></i> 关键词</label>
               <input name="keyword" class="form-control" 
-                     placeholder="如：python, data, backend, frontend" 
+                     placeholder="如：python, java, 前端" 
                      value="python" required/>
             </div>
-            <div class="col-md-5">
+            <div class="col-md-3">
               <label class="form-label"><i class="bi bi-geo-alt"></i> 地点过滤（可选）</label>
               <input name="city" class="form-control" 
-                     placeholder="如：Remote, Europe, Japan, Beijing"/>
+                     placeholder="如：北京, 上海, Remote"/>
             </div>
             <div class="col-md-2">
               <label class="form-label">&nbsp;</label>
@@ -168,6 +175,8 @@
           <div class="alert alert-info mt-3 mb-0">
             <i class="bi bi-info-circle"></i> 
             <strong>提示：</strong>首次使用请先采集数据，然后进入看板查看可视化结果。
+            <br><small>• RemoteOK：远程工作平台，支持全球岗位</small>
+            <br><small>• 前程无忧：国内招聘平台，支持城市筛选</small>
           </div>
         </div>
       </div>
@@ -190,8 +199,8 @@
       <div class="info-section">
         <h6><i class="bi bi-info-circle"></i> 系统说明</h6>
         <ul class="mb-0 small">
-          <li>数据源：默认使用 RemoteOK 公开 API（演示用途）</li>
-          <li>扩展性：可在 <code>crawler/adapters/</code> 中添加其他平台适配器</li>
+          <li>数据源：支持 RemoteOK 和前程无忧 (51job) 两个平台</li>
+          <li>扩展性：可在 <code>crawler/platforms/</code> 中添加其他平台适配器</li>
           <li>定时任务：系统每天 09:00 自动采集数据（可在配置中调整）</li>
         </ul>
       </div>

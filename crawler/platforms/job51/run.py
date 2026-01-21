@@ -66,22 +66,9 @@ def crawl_once(keyword: str, city: Optional[str] = None, region: Optional[str] =
     """
     cfg = load_config()
     job51_cfg = cfg.get("job51", {})
-    crawler_cfg = cfg.get("crawler", {})
     
-    # 从配置读取代理设置
-    proxies = None
-    proxy_http = crawler_cfg.get("proxy_http")
-    proxy_https = crawler_cfg.get("proxy_https")
-    if proxy_http or proxy_https:
-        proxies = {}
-        if proxy_http:
-            proxies['http'] = proxy_http
-        if proxy_https:
-            proxies['https'] = proxy_https
-        if 'http' in proxies and 'https' not in proxies:
-            proxies['https'] = proxies['http']
-        elif 'https' in proxies and 'http' not in proxies:
-            proxies['http'] = proxies['https']
+    # job51 平台无需代理，直接使用适配器（适配器内部使用 Playwright）
+    logger.info("使用 job51 平台，无需代理")
     
     # 从job51配置读取延迟设置
     delay_min = float(job51_cfg.get("delay_min", 1.0))
@@ -91,19 +78,8 @@ def crawl_once(keyword: str, city: Optional[str] = None, region: Optional[str] =
     # 限制页数
     pages = min(pages, max_pages)
     
-    if proxies:
-        logger.info("使用代理: %s", proxies)
-    else:
-        logger.info("未配置代理，使用直连")
-    
-    client = HttpClient(
-        min_sleep=delay_min,
-        max_sleep=delay_max,
-        proxies=proxies,
-    )
-    
     start_time = time.time()
-    adapter = Job51Adapter(client)
+    adapter = Job51Adapter(client=None)
     all_posts = []
     
     # 爬取多页数据

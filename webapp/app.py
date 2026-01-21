@@ -197,7 +197,14 @@ def crawl_now():
     try:
         keyword = request.form.get("keyword") or "python"
         city = request.form.get("city") or ""
-        result = crawl_once(keyword=keyword, city=city or None, pages=1)
+        platform = request.form.get("platform") or "remoteok"
+        
+        # 验证平台参数
+        if platform not in ["remoteok", "job51"]:
+            platform = "remoteok"
+        
+        # web应用一次采集数据采集10页
+        result = crawl_once(keyword=keyword, city=city or None, pages=10, platform=platform)
         
         # 返回详细的JSON响应
         return jsonify({
@@ -218,14 +225,15 @@ def crawl_now():
 def start_scheduler():
     cfg = load_config()
     keyword = cfg.get("crawler", {}).get("default_keyword", "python")
+    platform = cfg.get("crawler", {}).get("default_platform", "remoteok")
     sched = BackgroundScheduler(daemon=True)
     # Every day at 09:00 local time (you can adjust)
     def scheduled_crawl():
         try:
-            result = crawl_once(keyword=keyword, city=None, pages=1)
+            result = crawl_once(keyword=keyword, city=None, pages=1, platform=platform)
             from ..utils.log import get_logger
             logger = get_logger(__name__)
-            logger.info(f"定时采集完成: {result['count']} 条岗位")
+            logger.info(f"定时采集完成: {result['count']} 条岗位 (平台={platform})")
         except Exception as e:
             from ..utils.log import get_logger
             logger = get_logger(__name__)
