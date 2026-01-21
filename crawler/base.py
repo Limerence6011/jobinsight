@@ -1,6 +1,12 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import List, Optional, Any, Iterator
+from datetime import datetime
+
+# 【修复点 1】把丢失的工具函数加回来
+def now_iso() -> str:
+    """获取当前时间的 ISO 格式字符串"""
+    return datetime.now().isoformat()
 
 @dataclass
 class JobPost:
@@ -25,10 +31,10 @@ class JobPost:
     pub_date: Optional[str] = None
     raw_data: Optional[str] = None
 
-    # 兼容性字段 (适配 db.py)
+    # 兼容性字段 (适配 db.py 和 51job 爬虫)
     education_raw: Optional[str] = None   
     exp_raw: Optional[str] = None         
-    description: Optional[str] = None     # 【新增】职位描述/详情
+    description: Optional[str] = None     
 
 # 别名兼容
 Job = JobPost
