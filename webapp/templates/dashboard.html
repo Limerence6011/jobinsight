@@ -6,75 +6,322 @@
   <title>JobInsight - 可视化看板</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
   <style>
     :root {
       --primary-color: #4f46e5;
       --secondary-color: #10b981;
       --accent-color: #f59e0b;
+      --danger-color: #ef4444;
+      --purple: #8b5cf6;
+      --pink: #ec4899;
     }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
     body {
-      background: #f8fafc;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     }
+    
     .navbar-custom {
-      background: linear-gradient(135deg, var(--primary-color) 0%, #7c3aed 100%);
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
       padding: 1rem 0;
     }
+    
     .navbar-custom .navbar-brand {
-      color: white !important;
+      color: var(--primary-color) !important;
       font-weight: 700;
       font-size: 1.5rem;
     }
-    .navbar-custom .btn {
-      border-radius: 8px;
-      margin-left: 0.5rem;
+    
+    .main-container {
+      padding: 2rem 0;
     }
-    .chart-card {
+    
+    /* 统计卡片 */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .stat-card {
       background: white;
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      animation: slideUp 0.6s ease-out;
+      animation-fill-mode: both;
+    }
+    
+    .stat-card:nth-child(1) { animation-delay: 0.1s; }
+    .stat-card:nth-child(2) { animation-delay: 0.2s; }
+    .stat-card:nth-child(3) { animation-delay: 0.3s; }
+    .stat-card:nth-child(4) { animation-delay: 0.4s; }
+    
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary-color), var(--purple));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s ease;
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+    
+    .stat-card:hover::before {
+      transform: scaleX(1);
+    }
+    
+    .stat-icon {
+      width: 60px;
+      height: 60px;
       border-radius: 15px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
-      transition: transform 0.3s, box-shadow 0.3s;
-    }
-    .chart-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 15px rgba(0,0,0,0.15);
-    }
-    .chart-title {
-      font-weight: 600;
-      color: #1f2937;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.75rem;
       margin-bottom: 1rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 2px solid #e5e7eb;
-    }
-    iframe {
-      width: 100%;
-      height: 460px;
-      border: 0;
-      background: #fff;
-      border-radius: 10px;
-    }
-    .stats-card {
-      background: linear-gradient(135deg, var(--secondary-color) 0%, #059669 100%);
+      background: linear-gradient(135deg, var(--primary-color), var(--purple));
       color: white;
-      border-radius: 15px;
-      padding: 1.5rem;
-      text-align: center;
-      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
     }
-    .stats-card h3 {
+    
+    .stat-card:nth-child(2) .stat-icon {
+      background: linear-gradient(135deg, var(--secondary-color), #059669);
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    }
+    
+    .stat-card:nth-child(3) .stat-icon {
+      background: linear-gradient(135deg, var(--accent-color), #d97706);
+      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+    }
+    
+    .stat-card:nth-child(4) .stat-icon {
+      background: linear-gradient(135deg, var(--pink), #db2777);
+      box-shadow: 0 4px 15px rgba(236, 72, 153, 0.3);
+    }
+    
+    .stat-label {
+      font-size: 0.875rem;
+      color: #64748b;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .stat-value {
       font-size: 2.5rem;
       font-weight: 700;
-      margin: 0;
+      color: #1e293b;
+      line-height: 1;
+      margin-bottom: 0.25rem;
     }
-    .stats-card p {
-      margin: 0.5rem 0 0 0;
-      opacity: 0.9;
+    
+    .stat-unit {
+      font-size: 0.875rem;
+      color: #94a3b8;
     }
-    .alert {
-      border-radius: 10px;
-      border: none;
+    
+    /* 图表卡片 */
+    .chart-card {
+      background: white;
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      animation: fadeIn 0.8s ease-out;
+      animation-fill-mode: both;
+    }
+    
+    .chart-card:nth-child(1) { animation-delay: 0.5s; }
+    .chart-card:nth-child(2) { animation-delay: 0.6s; }
+    .chart-card:nth-child(3) { animation-delay: 0.7s; }
+    
+    .chart-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+    
+    .chart-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #f1f5f9;
+    }
+    
+    .chart-title {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #1e293b;
+    }
+    
+    .chart-title i {
+      font-size: 1.5rem;
+      color: var(--primary-color);
+    }
+    
+    .chart-container {
+      position: relative;
+      height: 400px;
+      margin-top: 1rem;
+    }
+    
+    .chart-container-large {
+      height: 500px;
+    }
+    
+    /* 词云容器 */
+    .wordcloud-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      justify-content: center;
+      align-items: center;
+      min-height: 400px;
+      padding: 2rem;
+    }
+    
+    .word-tag {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      cursor: default;
+      animation: scaleIn 0.5s ease-out;
+      animation-fill-mode: both;
+    }
+    
+    .word-tag:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    /* 空状态 */
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: #64748b;
+    }
+    
+    .empty-state i {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+    
+    .empty-state h3 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+      color: #475569;
+    }
+    
+    /* 加载状态 */
+    .loading-spinner {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 400px;
+    }
+    
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid #f1f5f9;
+      border-top-color: var(--primary-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    /* 动画 */
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+    
+    @keyframes scaleIn {
+      from {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+    
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+    
+    /* 响应式 */
+    @media (max-width: 768px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .chart-container {
+        height: 300px;
+      }
+      
+      .chart-container-large {
+        height: 400px;
+      }
+      
+      .stat-value {
+        font-size: 2rem;
+      }
+    }
+    
+    /* 数字动画 */
+    .number-animate {
+      display: inline-block;
     }
   </style>
 </head>
@@ -86,71 +333,489 @@
         <i class="bi bi-graph-up-arrow"></i> JobInsight Dashboard
       </a>
       <div class="d-flex">
-        <a class="btn btn-light btn-sm" href="/">
+        <a class="btn btn-outline-primary btn-sm" href="/">
           <i class="bi bi-house"></i> 首页
         </a>
-        <a class="btn btn-warning btn-sm text-white" href="/recommend">
+        <a class="btn btn-warning btn-sm text-white ms-2" href="/recommend">
           <i class="bi bi-lightbulb"></i> 岗位推荐
         </a>
       </div>
     </div>
   </nav>
 
-  <div class="container-fluid py-4">
-    <!-- 错误/提示信息 -->
-    {% if error_message %}
-    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-      <i class="bi bi-exclamation-triangle"></i>
-      <strong>警告：</strong>{{ error_message }}
-      <br>请先<a href="/" class="alert-link">采集数据</a>再查看看板。
-      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-    {% elif not has_data %}
-    <div class="alert alert-info alert-dismissible fade show" role="alert">
-      <i class="bi bi-info-circle"></i>
-      <strong>提示：</strong>当前没有数据，请先<a href="/" class="alert-link">采集数据</a>。
-      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-    {% endif %}
+  <div class="container-fluid main-container">
+    <div class="container">
+      <!-- 统计卡片 -->
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="bi bi-briefcase-fill"></i>
+          </div>
+          <div class="stat-label">总岗位数</div>
+          <div class="stat-value">
+            <span class="number-animate" id="statTotalJobs">0</span>
+          </div>
+          <div class="stat-unit">条职位信息</div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="bi bi-building"></i>
+          </div>
+          <div class="stat-label">公司数量</div>
+          <div class="stat-value">
+            <span class="number-animate" id="statCompanies">0</span>
+          </div>
+          <div class="stat-unit">家招聘公司</div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="bi bi-geo-alt-fill"></i>
+          </div>
+          <div class="stat-label">城市覆盖</div>
+          <div class="stat-value">
+            <span class="number-animate" id="statCities">0</span>
+          </div>
+          <div class="stat-unit">个城市/地区</div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="bi bi-cash-stack"></i>
+          </div>
+          <div class="stat-label">平均薪资</div>
+          <div class="stat-value">
+            <span class="number-animate" id="statSalary">-</span>
+          </div>
+          <div class="stat-unit" id="statSalaryUnit">元/月</div>
+        </div>
+      </div>
 
-    <!-- 图表区域 -->
-    <div class="row g-4">
-      <div class="col-lg-6">
-        <div class="chart-card">
-          <div class="chart-title">
-            <i class="bi bi-geo-alt-fill text-primary"></i> 城市/地区岗位热度 Top
+      <!-- 图表区域 -->
+      <div class="row g-4">
+        <!-- 城市热度图 -->
+        <div class="col-lg-6">
+          <div class="chart-card">
+            <div class="chart-header">
+              <div class="chart-title">
+                <i class="bi bi-geo-alt-fill"></i>
+                <span>城市/地区岗位热度</span>
+              </div>
+            </div>
+            <div class="chart-container" id="cityChartContainer">
+              <div class="loading-spinner">
+                <div class="spinner"></div>
+              </div>
+            </div>
           </div>
-          <iframe src="{{ url_for('static', filename=city_chart) }}"></iframe>
         </div>
-      </div>
-      <div class="col-lg-6">
-        <div class="chart-card">
-          <div class="chart-title">
-            <i class="bi bi-graph-up text-success"></i> 岗位数量趋势
-          </div>
-          <div class="small text-muted mb-2">
-            <i class="bi bi-arrow-repeat"></i> 动态更新：随采集数据自动变化
-          </div>
-          <iframe src="{{ url_for('static', filename=trend_chart) }}"></iframe>
-        </div>
-      </div>
-      <div class="col-12">
-        <div class="chart-card">
-          <div class="chart-title">
-            <i class="bi bi-cloud-fill text-warning"></i> 技能/标签词云
-          </div>
-          <iframe style="height:520px" src="{{ url_for('static', filename=tags_chart) }}"></iframe>
-        </div>
-      </div>
-    </div>
 
-    <!-- 底部提示 -->
-    <div class="alert alert-light mt-4">
-      <i class="bi bi-clock"></i>
-      <strong>定时采集：</strong>系统每天 09:00 自动采集数据（可在 <code>webapp/app.py</code> 中调整），趋势图会自动体现市场变化。
+        <!-- 趋势图 -->
+        <div class="col-lg-6">
+          <div class="chart-card">
+            <div class="chart-header">
+              <div class="chart-title">
+                <i class="bi bi-graph-up"></i>
+                <span>岗位数量趋势</span>
+              </div>
+            </div>
+            <div class="chart-container" id="trendChartContainer">
+              <div class="loading-spinner">
+                <div class="spinner"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 技能词云 -->
+        <div class="col-12">
+          <div class="chart-card">
+            <div class="chart-header">
+              <div class="chart-title">
+                <i class="bi bi-cloud-fill"></i>
+                <span>技能/标签热度</span>
+              </div>
+            </div>
+            <div class="chart-container-large" id="tagsChartContainer">
+              <div class="loading-spinner">
+                <div class="spinner"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // 注册插件
+    Chart.register(ChartDataLabels);
+    
+    // 全局变量
+    let cityChart = null;
+    let trendChart = null;
+    
+    // 数字动画函数
+    function animateNumber(element, target, duration = 1000) {
+      const start = 0;
+      const increment = target / (duration / 16);
+      let current = start;
+      
+      const timer = setInterval(() => {
+        current += increment;
+        if (current >= target) {
+          current = target;
+          clearInterval(timer);
+        }
+        element.textContent = Math.floor(current).toLocaleString();
+      }, 16);
+    }
+    
+    // 加载数据
+    async function loadDashboardData() {
+      try {
+        const response = await fetch('/api/dashboard/data');
+        const data = await response.json();
+        
+        if (!data.has_data) {
+          showEmptyState();
+          return;
+        }
+        
+        // 更新统计卡片
+        updateStats(data.stats);
+        
+        // 渲染图表
+        renderCityChart(data.city_data);
+        renderTrendChart(data.trend_data);
+        renderTagsChart(data.tags_data);
+        
+      } catch (error) {
+        console.error('加载数据失败:', error);
+        showErrorState();
+      }
+    }
+    
+    // 更新统计卡片
+    function updateStats(stats) {
+      const totalJobsEl = document.getElementById('statTotalJobs');
+      const companiesEl = document.getElementById('statCompanies');
+      const citiesEl = document.getElementById('statCities');
+      const salaryEl = document.getElementById('statSalary');
+      const salaryUnitEl = document.getElementById('statSalaryUnit');
+      
+      if (totalJobsEl) animateNumber(totalJobsEl, stats.total_jobs || 0);
+      if (companiesEl) animateNumber(companiesEl, stats.unique_companies || 0);
+      if (citiesEl) animateNumber(citiesEl, stats.unique_cities || 0);
+      
+      if (stats.salary_stats && stats.salary_stats.avg) {
+        const avg = Math.round(stats.salary_stats.avg);
+        if (avg >= 10000) {
+          salaryEl.textContent = (avg / 10000).toFixed(1) + '万';
+          salaryUnitEl.textContent = '元/月';
+        } else {
+          salaryEl.textContent = avg.toLocaleString();
+          salaryUnitEl.textContent = '元/月';
+        }
+      } else {
+        salaryEl.textContent = '-';
+        salaryUnitEl.textContent = '暂无数据';
+      }
+    }
+    
+    // 渲染城市图表
+    function renderCityChart(cityData) {
+      const container = document.getElementById('cityChartContainer');
+      
+      if (!cityData || cityData.length === 0) {
+        container.innerHTML = '<div class="empty-state"><i class="bi bi-inbox"></i><h3>暂无数据</h3></div>';
+        return;
+      }
+      
+      // 限制显示数量（少量数据时全部显示）
+      const displayData = cityData.slice(0, Math.min(15, cityData.length));
+      const labels = displayData.map(d => d.city);
+      const values = displayData.map(d => d.count);
+      
+      // 生成渐变色
+      const colors = generateGradientColors(values.length, '#4f46e5', '#8b5cf6');
+      
+      container.innerHTML = '<canvas id="cityChart"></canvas>';
+      
+      const ctx = document.getElementById('cityChart').getContext('2d');
+      cityChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: '岗位数',
+            data: values,
+            backgroundColor: colors,
+            borderColor: colors.map(c => c.replace('0.8', '1')),
+            borderWidth: 2,
+            borderRadius: 8,
+            borderSkipped: false,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              padding: 12,
+              titleFont: { size: 14, weight: 'bold' },
+              bodyFont: { size: 13 },
+              cornerRadius: 8,
+              displayColors: true,
+              callbacks: {
+                label: function(context) {
+                  return `岗位数: ${context.parsed.y.toLocaleString()} 条`;
+                }
+              }
+            },
+            datalabels: {
+              anchor: 'end',
+              align: 'top',
+              color: '#1e293b',
+              font: {
+                weight: 'bold',
+                size: 12
+              },
+              formatter: (value) => value.toLocaleString()
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: {
+                color: '#f1f5f9'
+              },
+              ticks: {
+                color: '#64748b',
+                font: { size: 12 }
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              },
+              ticks: {
+                color: '#64748b',
+                font: { size: 11 },
+                maxRotation: 45,
+                minRotation: 45
+              }
+            }
+          },
+          animation: {
+            duration: 1500,
+            easing: 'easeOutQuart'
+          }
+        },
+        plugins: [ChartDataLabels]
+      });
+    }
+    
+    // 渲染趋势图
+    function renderTrendChart(trendData) {
+      const container = document.getElementById('trendChartContainer');
+      
+      if (!trendData || trendData.length === 0) {
+        container.innerHTML = '<div class="empty-state"><i class="bi bi-inbox"></i><h3>暂无数据</h3></div>';
+        return;
+      }
+      
+      const labels = trendData.map(d => d.date);
+      const values = trendData.map(d => d.count);
+      
+      container.innerHTML = '<canvas id="trendChart"></canvas>';
+      
+      const ctx = document.getElementById('trendChart').getContext('2d');
+      trendChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: '岗位数',
+            data: values,
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 5,
+            pointHoverRadius: 7,
+            pointBackgroundColor: '#10b981',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              padding: 12,
+              titleFont: { size: 14, weight: 'bold' },
+              bodyFont: { size: 13 },
+              cornerRadius: 8,
+              callbacks: {
+                label: function(context) {
+                  return `岗位数: ${context.parsed.y.toLocaleString()} 条`;
+                }
+              }
+            },
+            datalabels: {
+              display: values.length <= 15, // 数据点少时显示标签
+              anchor: 'end',
+              align: 'top',
+              color: '#10b981',
+              font: {
+                weight: 'bold',
+                size: 11
+              },
+              formatter: (value) => value.toLocaleString()
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: {
+                color: '#f1f5f9'
+              },
+              ticks: {
+                color: '#64748b',
+                font: { size: 12 }
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              },
+              ticks: {
+                color: '#64748b',
+                font: { size: 11 }
+              }
+            }
+          },
+          animation: {
+            duration: 1500,
+            easing: 'easeOutQuart'
+          }
+        },
+        plugins: [ChartDataLabels]
+      });
+    }
+    
+    // 渲染标签词云
+    function renderTagsChart(tagsData) {
+      const container = document.getElementById('tagsChartContainer');
+      
+      if (!tagsData || tagsData.length === 0) {
+        container.innerHTML = '<div class="empty-state"><i class="bi bi-inbox"></i><h3>暂无数据</h3></div>';
+        return;
+      }
+      
+      // 计算最大和最小值用于字体大小
+      const counts = tagsData.map(d => d.count);
+      const maxCount = Math.max(...counts);
+      const minCount = Math.min(...counts);
+      
+      // 生成颜色
+      const colors = ['#4f46e5', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#3b82f6', '#6366f1'];
+      
+      let html = '<div class="wordcloud-container">';
+      tagsData.forEach((item, index) => {
+        // 计算字体大小（基于数量，少量数据时使用更大的基础字体）
+        const ratio = (item.count - minCount) / (maxCount - minCount || 1);
+        const baseSize = tagsData.length <= 10 ? 18 : 14; // 少量数据时基础字体更大
+        const fontSize = baseSize + ratio * (tagsData.length <= 10 ? 20 : 24);
+        const colorIndex = index % colors.length;
+        const delay = index * 0.05;
+        
+        html += `
+          <span class="word-tag" 
+                style="font-size: ${fontSize}px; 
+                       background: linear-gradient(135deg, ${colors[colorIndex]}, ${colors[(colorIndex + 1) % colors.length]}); 
+                       color: white;
+                       animation-delay: ${delay}s;
+                       box-shadow: 0 4px 12px rgba(79, 70, 229, ${0.2 + ratio * 0.3});">
+            ${item.tag} <small style="opacity: 0.9;">(${item.count})</small>
+          </span>
+        `;
+      });
+      html += '</div>';
+      
+      container.innerHTML = html;
+    }
+    
+    // 生成渐变色
+    function generateGradientColors(count, startColor, endColor) {
+      const colors = [];
+      for (let i = 0; i < count; i++) {
+        const ratio = i / (count - 1 || 1);
+        const color = interpolateColor(startColor, endColor, ratio);
+        colors.push(color);
+      }
+      return colors;
+    }
+    
+    // 颜色插值
+    function interpolateColor(color1, color2, ratio) {
+      const hex1 = color1.replace('#', '');
+      const hex2 = color2.replace('#', '');
+      const r1 = parseInt(hex1.substr(0, 2), 16);
+      const g1 = parseInt(hex1.substr(2, 2), 16);
+      const b1 = parseInt(hex1.substr(4, 2), 16);
+      const r2 = parseInt(hex2.substr(0, 2), 16);
+      const g2 = parseInt(hex2.substr(2, 2), 16);
+      const b2 = parseInt(hex2.substr(4, 2), 16);
+      
+      const r = Math.round(r1 + (r2 - r1) * ratio);
+      const g = Math.round(g1 + (g2 - g1) * ratio);
+      const b = Math.round(b1 + (b2 - b1) * ratio);
+      
+      return `rgba(${r}, ${g}, ${b}, 0.8)`;
+    }
+    
+    // 显示空状态
+    function showEmptyState() {
+      document.getElementById('statsGrid').innerHTML = `
+        <div class="col-12">
+          <div class="stat-card">
+            <div class="empty-state">
+              <i class="bi bi-inbox"></i>
+              <h3>暂无数据</h3>
+              <p>请先<a href="/">采集数据</a>再查看看板</p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    
+    // 显示错误状态
+    function showErrorState() {
+      const containers = ['cityChartContainer', 'trendChartContainer', 'tagsChartContainer'];
+      containers.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.innerHTML = '<div class="empty-state"><i class="bi bi-exclamation-triangle"></i><h3>加载失败</h3><p>请刷新页面重试</p></div>';
+        }
+      });
+    }
+    
+    // 页面加载时获取数据
+    document.addEventListener('DOMContentLoaded', loadDashboardData);
+  </script>
 </body>
 </html>

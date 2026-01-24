@@ -185,7 +185,20 @@ def start_web_app(host="127.0.0.1", port=5000, debug=False, with_scheduler=True)
             start_scheduler()
             print("[OK] 定时任务调度器已启动（每天 09:00 自动采集）")
         
+        # 确保模板配置正确（即使在导入后）
+        from jobinsight.settings import BASE_DIR
+        expected_template_dir = BASE_DIR / "webapp" / "templates"
+        actual_template_dir = app.template_folder
+        
         print(f"\n{'=' * 50}")
+        print("Web 应用配置检查")
+        print(f"{'=' * 50}")
+        print(f"模板目录配置: {actual_template_dir}")
+        print(f"预期模板目录: {expected_template_dir}")
+        print(f"模板目录匹配: {'✓' if str(expected_template_dir) == actual_template_dir else '✗'}")
+        print(f"模板自动重载: {app.config.get('TEMPLATES_AUTO_RELOAD', '未设置')}")
+        print(f"Jinja2缓存: {'已禁用' if app.jinja_env.cache is None else '已启用'}")
+        print(f"{'=' * 50}")
         print("Web 应用已启动！")
         print(f"{'=' * 50}")
         print(f"访问地址: http://{host}:{port}")
@@ -194,7 +207,7 @@ def start_web_app(host="127.0.0.1", port=5000, debug=False, with_scheduler=True)
         print(f"\n按 Ctrl+C 停止服务器")
         print(f"{'=' * 50}\n")
         
-        app.run(host=host, port=port, debug=debug)
+        app.run(host=host, port=port, debug=debug, use_reloader=debug)
     except KeyboardInterrupt:
         print("\n\n[INFO] 服务器已停止")
         sys.exit(0)

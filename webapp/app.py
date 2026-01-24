@@ -16,7 +16,25 @@ from ..crawler.run_crawl import crawl_once
 template_dir = BASE_DIR / "webapp" / "templates"
 static_dir = BASE_DIR / "webapp" / "static"
 
+# 确保路径存在
+template_dir.mkdir(parents=True, exist_ok=True)
+static_dir.mkdir(parents=True, exist_ok=True)
+
+# 调试：打印实际路径
+from ..utils.log import get_logger
+logger = get_logger(__name__)
+logger.info(f"Template directory: {template_dir}")
+logger.info(f"Template directory exists: {template_dir.exists()}")
+
 app = Flask(__name__, template_folder=str(template_dir), static_folder=str(static_dir))
+
+# 禁用模板缓存，确保总是加载最新模板
+app.config['TEMPLATES_AUTO_RELOAD'] = True
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0  # 禁用静态文件缓存
+
+# 强制禁用Jinja2模板缓存
+app.jinja_env.auto_reload = True
+app.jinja_env.cache = None  # 禁用模板缓存
 
 # 添加错误处理器
 @app.errorhandler(500)
@@ -33,7 +51,11 @@ def handle_exception(e):
     logger.error(f"未处理的异常: {e}", exc_info=True)
     return f"错误: {str(e)}", 500
 
+# 注意：build_charts函数已废弃，不再使用
+# 新的dashboard使用Chart.js前端渲染，数据通过/api/dashboard/data API获取
+# 保留此函数仅用于向后兼容（测试脚本可能还在使用）
 def build_charts():
+    """已废弃：旧的图表生成函数，使用pyecharts生成静态HTML"""
     try:
         cfg = load_config()
         days = int(cfg.get("app", {}).get("data_days_window", 30))
@@ -71,29 +93,21 @@ def index():
 
 @app.get("/dashboard")
 def dashboard():
+    """Dashboard页面 - 使用新的Chart.js前端可视化"""
     try:
-        df = build_charts()
-        # 检查是否有数据
-        has_data = len(df) > 0
-        return render_template(
-            "dashboard.html",
-            city_chart="charts/city_top.html",
-            trend_chart="charts/trend.html",
-            tags_chart="charts/tags_wc.html",
-            has_data=has_data,
-        )
+        # 记录模板加载（用于调试）
+        template_path = template_dir / "dashboard.html"
+        if template_path.exists():
+            logger.info(f"加载Dashboard模板: {template_path} (大小: {template_path.stat().st_size:,} 字节)")
+        else:
+            logger.error(f"Dashboard模板不存在: {template_path}")
+        
+        # 不再需要build_charts，数据通过API获取
+        # 新的dashboard使用Chart.js前端渲染，数据从/api/dashboard/data获取
+        return render_template("dashboard.html")
     except Exception as e:
-        from ..utils.log import get_logger
-        logger = get_logger(__name__)
         logger.error(f"Dashboard 页面错误: {e}", exc_info=True)
-        return render_template(
-            "dashboard.html",
-            city_chart="charts/city_top.html",
-            trend_chart="charts/trend.html",
-            tags_chart="charts/tags_wc.html",
-            has_data=False,
-            error_message=str(e),
-        ), 500
+        return render_template("dashboard.html"), 500
 
 @app.route("/api/autocomplete", methods=["GET"])
 def autocomplete_data():
@@ -135,6 +149,91 @@ def autocomplete_data():
         logger = get_logger(__name__)
         logger.error(f"获取自动完成数据失败: {e}", exc_info=True)
         return jsonify({"cities": [], "skills": []}), 500
+
+@app.route("/api/dashboard/data", methods=["GET"])
+def dashboard_data():
+    """获取看板数据（JSON格式）"""
+    try:
+        cfg = load_config()
+        days = int(cfg.get("app", {}).get("data_days_window", 30))
+        df = load_jobs(days=days)
+        
+        if len(df) == 0:
+            return jsonify({
+                "has_data": False,
+                "stats": {},
+                "city_data": [],
+                "trend_data": [],
+                "tags_data": []
+            })
+        
+        # 统计数据
+        total_jobs = len(df)
+        unique_companies = df["company"].nunique() if "company" in df.columns else 0
+        unique_cities = df["city"].nunique() if "city" in df.columns else 0
+        
+        # 城市数据（Top 20）
+        city_series = city_top(df, 20)
+        city_data = [
+            {"city": str(city), "count": int(count)}
+            for city, count in city_series.items()
+        ]
+        
+        # 趋势数据
+        trend_df = trend_by_date(df)
+        trend_data = []
+        if len(trend_df) > 0:
+            trend_data = [
+                {
+                    "date": row["crawl_date"].strftime("%Y-%m-%d") if hasattr(row["crawl_date"], "strftime") else str(row["crawl_date"]),
+                    "count": int(row["postings"])
+                }
+                for _, row in trend_df.iterrows()
+            ]
+        
+        # 标签数据（Top 30）
+        tag_series = tag_top(df, 30)
+        tags_data = [
+            {"tag": str(tag), "count": int(count)}
+            for tag, count in tag_series.items()
+        ]
+        
+        # 薪资统计（如果有）
+        salary_stats = {}
+        if "salary_avg" in df.columns:
+            salary_avg = df["salary_avg"].dropna()
+            if len(salary_avg) > 0:
+                salary_stats = {
+                    "avg": float(salary_avg.mean()),
+                    "median": float(salary_avg.median()),
+                    "min": float(salary_avg.min()),
+                    "max": float(salary_avg.max())
+                }
+        
+        return jsonify({
+            "has_data": True,
+            "stats": {
+                "total_jobs": total_jobs,
+                "unique_companies": unique_companies,
+                "unique_cities": unique_cities,
+                "salary_stats": salary_stats
+            },
+            "city_data": city_data,
+            "trend_data": trend_data,
+            "tags_data": tags_data
+        })
+    except Exception as e:
+        from ..utils.log import get_logger
+        logger = get_logger(__name__)
+        logger.error(f"获取看板数据失败: {e}", exc_info=True)
+        return jsonify({
+            "has_data": False,
+            "error": str(e),
+            "stats": {},
+            "city_data": [],
+            "trend_data": [],
+            "tags_data": []
+        }), 500
 
 @app.route("/recommend", methods=["GET", "POST"])
 def recommend_page():
