@@ -27,6 +27,10 @@ logger.info(f"Template directory: {template_dir}")
 logger.info(f"Template directory exists: {template_dir.exists()}")
 
 app = Flask(__name__, template_folder=str(template_dir), static_folder=str(static_dir))
+from jinja2 import FileSystemLoader
+
+# 强制用 FileSystemLoader（有 searchpath），避免某些检查/调试逻辑访问 searchpath 时崩溃
+app.jinja_loader = FileSystemLoader(str(template_dir))
 
 # 禁用模板缓存，确保总是加载最新模板
 app.config['TEMPLATES_AUTO_RELOAD'] = True
@@ -93,21 +97,48 @@ def index():
 
 @app.get("/dashboard")
 def dashboard():
-    """Dashboard页面 - 使用新的Chart.js前端可视化"""
+    """Dashboard页面 - 强制使用最新模板文件"""
+    # 强制使用绝对路径读取模板文件
+    force_path = template_dir / "dashboard.html"
+    force_path_abs = force_path.resolve()
+    
+    # 记录调试信息
+    logger.info(f"[DASHBOARD] 开始处理请求")
+    logger.info(f"[DASHBOARD] 模板文件路径: {force_path_abs}")
+    logger.info(f"[DASHBOARD] 文件存在: {force_path_abs.exists()}")
+    
+    if not force_path_abs.exists():
+        logger.error(f"[DASHBOARD] 模板文件不存在: {force_path_abs}")
+        return f"错误: 模板文件不存在: {force_path_abs}", 500
+    
+    # 直接读取文件内容
     try:
-        # 记录模板加载（用于调试）
-        template_path = template_dir / "dashboard.html"
-        if template_path.exists():
-            logger.info(f"加载Dashboard模板: {template_path} (大小: {template_path.stat().st_size:,} 字节)")
-        else:
-            logger.error(f"Dashboard模板不存在: {template_path}")
+        template_content = force_path_abs.read_text(encoding='utf-8')
+        content_length = len(template_content)
+        logger.info(f"[DASHBOARD] 成功读取文件，长度: {content_length:,} 字符")
         
-        # 不再需要build_charts，数据通过API获取
-        # 新的dashboard使用Chart.js前端渲染，数据从/api/dashboard/data获取
-        return render_template("dashboard.html")
+        # 验证内容
+        has_chartjs = 'chart.js' in template_content.lower() or 'chart.umd' in template_content.lower()
+        logger.info(f"[DASHBOARD] 包含Chart.js: {has_chartjs}")
+        
+        if not has_chartjs:
+            logger.warning(f"[DASHBOARD] 警告: 模板文件不包含Chart.js，可能是旧版本")
+        
+        # 直接返回文件内容，完全绕过Flask模板系统
+        from flask import make_response
+        response = make_response(template_content)
+        response.headers['Content-Type'] = 'text/html; charset=utf-8'
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+        response.headers['X-Content-Length'] = str(content_length)  # 添加自定义头用于调试
+        
+        logger.info(f"[DASHBOARD] 返回响应，内容长度: {content_length:,} 字符")
+        return response
+        
     except Exception as e:
-        logger.error(f"Dashboard 页面错误: {e}", exc_info=True)
-        return render_template("dashboard.html"), 500
+        logger.error(f"[DASHBOARD] 读取文件失败: {e}", exc_info=True)
+        return f"错误: 无法读取模板文件: {e}", 500
 
 @app.route("/api/autocomplete", methods=["GET"])
 def autocomplete_data():
