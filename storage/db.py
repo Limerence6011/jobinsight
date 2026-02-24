@@ -2,7 +2,7 @@ from __future__ import annotations
 import json
 import datetime as dt
 from typing import Set, Tuple
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.orm import Session
 
 from ..settings import get_db_url
@@ -16,6 +16,20 @@ ENGINE = create_engine(get_db_url(), echo=False, pool_pre_ping=True, pool_recycl
 
 # 创建表（如果不存在）
 Base.metadata.create_all(ENGINE)
+
+def ensure_schema_compatibility() -> None:
+    """
+    Apply lightweight schema compatibility fixes for existing deployments.
+    """
+    with ENGINE.begin() as conn:
+        inspector = inspect(conn)
+        table_names = set(inspector.get_table_names())
+        if "users" in table_names:
+            user_columns = {col["name"] for col in inspector.get_columns("users")}
+            if "is_admin" not in user_columns:
+                conn.execute(text("ALTER TABLE users ADD COLUMN is_admin BOOLEAN NOT NULL DEFAULT 0"))
+
+ensure_schema_compatibility()
 
 def get_existing_job_keys(platform: str = None, keyword: str = None, city: str = None, limit: int = 1000) -> Set[Tuple[str, str]]:
     """

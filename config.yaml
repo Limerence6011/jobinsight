@@ -1,6 +1,7 @@
 app:
   data_days_window: 30
   topn: 20
+  secret_key: "change-this-secret"
 
 database:
   # MySQL 数据库配置
@@ -15,6 +16,7 @@ crawler:
   # data_sources: remoteok_api (default), placeholders: zhilian, boss, 51job
   data_sources: ["remoteok_api"]
   default_keyword: "python"
+  default_platform: "remoteok"
   pages: 1
   polite_sleep_min: 0.6
   polite_sleep_max: 1.5
