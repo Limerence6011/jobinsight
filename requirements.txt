@@ -10,3 +10,4 @@ flask>=2.0.0
 apscheduler>=3.7.0
 scikit-learn>=0.24.0
 pyyaml>=5.4.0
+playwright>=1.40.0

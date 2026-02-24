@@ -134,6 +134,19 @@
   <div class="main-container">
     <!-- Header -->
     <div class="header-section">
+      <div class="d-flex justify-content-end gap-2 mb-3">
+        {% if session.get('user_id') %}
+        <span class="badge bg-light text-dark align-self-center">
+          已登录：{{ session.get('username', 'User') }}
+        </span>
+        <form method="post" action="/logout" class="m-0">
+          <button class="btn btn-outline-light btn-sm" type="submit">退出</button>
+        </form>
+        {% else %}
+        <a class="btn btn-outline-light btn-sm" href="/login">登录</a>
+        <a class="btn btn-light btn-sm" href="/register">注册</a>
+        {% endif %}
+      </div>
       <h1><i class="bi bi-graph-up-arrow"></i> JobInsight</h1>
       <p>基于 Python 的岗位招聘数据分析与可视化系统</p>
       <p class="small mb-0">爬虫采集 → 数据清洗 → 可视化分析 → 智能推荐 → 趋势预测</p>
@@ -152,6 +165,8 @@
               <select name="platform" class="form-select" required>
                 <option value="remoteok">RemoteOK</option>
                 <option value="job51" selected>前程无忧 (51job)</option>
+                <option value="zhilian">智联招聘（占位）</option>
+                <option value="wuba58">58同城（占位）</option>
               </select>
             </div>
             <div class="col-md-4">
@@ -177,6 +192,7 @@
             <strong>提示：</strong>首次使用请先采集数据，然后进入看板查看可视化结果。
             <br><small>• RemoteOK：远程工作平台，支持全球岗位</small>
             <br><small>• 前程无忧：国内招聘平台，支持城市筛选</small>
+            <br><small>• 智联招聘 / 58同城：占位入口，后续接入授权适配器</small>
           </div>
         </div>
       </div>
@@ -199,7 +215,8 @@
       <div class="info-section">
         <h6><i class="bi bi-info-circle"></i> 系统说明</h6>
         <ul class="mb-0 small">
-          <li>数据源：支持 RemoteOK 和前程无忧 (51job) 两个平台</li>
+          <li>数据源：当前可用 RemoteOK、前程无忧 (51job)</li>
+          <li>平台占位：智联招聘、58同城入口已保留</li>
           <li>扩展性：可在 <code>crawler/platforms/</code> 中添加其他平台适配器</li>
           <li>定时任务：系统每天 09:00 自动采集数据（可在配置中调整）</li>
         </ul>
@@ -486,6 +503,16 @@
     const btn = form.querySelector('button[type="submit"]');
     const originalText = btn.innerHTML;
     const formData = new FormData(form);
+    const selectedPlatform = (formData.get('platform') || '').toString().toLowerCase();
+    const placeholderLabels = {
+      zhilian: '智联招聘',
+      wuba58: '58同城'
+    };
+
+    if (placeholderLabels[selectedPlatform]) {
+      showErrorAlert(`${placeholderLabels[selectedPlatform]} 当前为占位入口，暂未接入采集能力`);
+      return;
+    }
     
     // 显示加载状态
     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>采集中...';

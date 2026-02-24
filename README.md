@@ -62,6 +62,7 @@ JobInsight is a comprehensive Python-based job recruitment data analysis and vis
 
 - Python 3.7+ (recommended 3.11)
 - MySQL 5.7+ or MySQL 8.0+
+- Playwright (for 51job crawler)
 - Windows/macOS/Linux
 
 ---
@@ -158,7 +159,10 @@ After starting, visit: http://localhost:5000
 ```
 jobinsight/
 ├── utils/          # Utilities (logging, HTTP client, salary parsing, etc.)
-├── crawler/        # Crawler module (adapters, runner)
+├── crawler/        # Crawler module
+│   ├── adapters/   # Legacy adapters
+│   ├── platforms/  # Platform-specific crawlers (job51, boss, etc.)
+│   └── run_crawl.py
 ├── storage/        # Data storage (SQLAlchemy models, database operations)
 ├── pipeline/       # Data processing pipeline
 ├── analytics/      # Data analysis (statistics, trends, recommendations)
@@ -347,9 +351,12 @@ JobInsight 是一个基于 Python 的岗位招聘数据分析与可视化系统�
 #### 核心功能模块
 
 - **爬虫采集（必选）**
-  - `Requests` + 适配器模式（Adapter）
-  - 默认：RemoteOK API（`remoteok_api.py`），抓取岗位标题、公司、地点、标签、描述、链接等字段
-  - 支持扩展：在 `jobinsight/crawler/adapters/` 中添加新的适配器
+  - `Requests` + 适配器模式 & `Playwright`（针对动态网页）
+  - 支持平台：
+    - RemoteOK API (`remoteok_api.py`) - 默认，简单易用
+    - 前程无忧 51job (`crawler/platforms/job51`) - 使用 Playwright 模拟交互
+  - 待实现/占位：Boss直聘、智联招聘
+  - 支持扩展：在 `jobinsight/crawler/platforms/` 中添加新的平台适配器
 
 - **数据存储**
   - MySQL + SQLAlchemy
@@ -415,6 +422,7 @@ JobInsight 是一个基于 Python 的岗位招聘数据分析与可视化系统�
 
    ```bash
    pip install -r requirements.txt
+   playwright install  # 安装 Playwright 浏览器内核
    ```
 
 4. **配置 MySQL 数据库**
@@ -480,7 +488,10 @@ python run_crawl.py --keyword python --city Remote
 ```
 jobinsight/
 ├── utils/          # 工具模块（日志、HTTP客户端、薪资解析等）
-├── crawler/        # 爬虫模块（适配器、运行器）
+├── crawler/        # 爬虫模块
+│   ├── adapters/   # 旧版适配器
+│   ├── platforms/  # 分平台爬虫实现 (job51, boss 等)
+│   └── run_crawl.py
 ├── storage/        # 数据存储（SQLAlchemy模型、数据库操作）
 ├── pipeline/       # 数据处理管道
 ├── analytics/      # 数据分析（统计、趋势、推荐）
@@ -536,6 +547,9 @@ python run_crawl.py --keyword data --city "San Francisco"
 
 # 爬取多页数据
 python run_crawl.py --keyword backend --pages 3
+
+# 爬取前程无忧 51job (需要 Playwright)
+python -m jobinsight.crawler.platforms.job51.run --keyword python --city 上海
 ```
 
 #### Web 界面使用
@@ -561,9 +575,9 @@ python run_crawl.py --keyword backend --pages 3
 
 #### 添加新的爬虫适配器
 
-1. 在 `jobinsight/crawler/adapters/` 目录下创建新文件
-2. 实现 `JobAdapter` 协议（参考 `remoteok_api.py`）
-3. 在 `crawler/run_crawl.py` 中注册新适配器
+1. 在 `jobinsight/crawler/platforms/` 目录下创建新目录
+2. 实现 `Adapter` 类（参考 `job51/adapter.py`）
+3. 创建 `run.py` 脚本用于独立运行
 
 #### 自定义可视化
 
