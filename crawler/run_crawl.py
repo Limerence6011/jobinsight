@@ -9,6 +9,8 @@ from ..utils.http import HttpClient
 from ..utils.log import get_logger
 from .platforms.remoteok import RemoteOKApiAdapter
 from .platforms.job51.adapter import Job51Adapter
+from .platforms.zhilian.adapter import ZhilianAdapter
+from .platforms.wuba58.adapter import Wuba58Adapter
 from ..storage.db import upsert_jobs, get_existing_job_keys, get_all_existing_job_keys
 
 logger = get_logger(__name__)
@@ -75,6 +77,9 @@ def crawl_once(keyword: str, city: Optional[str], pages: int = 1, platform: str 
                 proxies['http'] = proxies['https']
     
     # 记录代理配置
+    if platform in ["zhilian", "wuba58"]:
+        raise NotImplementedError(f"{platform} 平台尚未实现，请使用授权接口或完善适配器。")
+
     if platform == "job51":
         logger.info("使用 job51 平台，无需代理")
     elif proxies:
@@ -297,7 +302,7 @@ def main():
     ap.add_argument("--keyword", default=default_keyword, help="search keyword")
     ap.add_argument("--city", default="", help="city/location filter (optional)")
     ap.add_argument("--pages", type=int, default=default_pages, help="kept for compatibility")
-    ap.add_argument("--platform", default="remoteok", choices=["remoteok", "job51"], help="platform to crawl")
+    ap.add_argument("--platform", default="remoteok", choices=["remoteok", "job51", "zhilian", "wuba58"], help="platform to crawl")
     args = ap.parse_args()
 
     try:

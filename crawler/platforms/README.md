@@ -51,6 +51,12 @@ python -m jobinsight.crawler.platforms.boss.run --keyword python --city 北京
 python -m jobinsight.crawler.platforms.zhilian.run --keyword python --city 北京
 ```
 
+### 58同城平台
+
+```bash
+python -m jobinsight.crawler.platforms.wuba58.run --keyword python --city 北京
+```
+
 ### 前程无忧51job平台
 
 ```bash
